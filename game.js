@@ -2056,73 +2056,7 @@ function drawBackground() {
     ctx.fillText("Jhoabxi: A D para moverse, W para saltar, M para disparar.", canvas.width / 2, 312);
     ctx.restore();
 
-    // Si ya venciste al jefe final, acomoda los botones:
-let supervivenciaDesbloqueado = recordRonda >= 20;
-if (supervivenciaDesbloqueado) {
-    botonJugar.x = canvas.width / 2 - 250;
-    drawButton(
-        botonJugar,
-        "JUGAR",
-        {
-            gradColors: botonJugar.hover ? ["#0F0", "#FFD700"] : ["#FFD700", "#0F0"],
-            borderColor: "#FFF",
-            shadowColor: botonJugar.hover ? "#00FF00" : "#FFD700",
-            fontColor: "#111",
-            fontSize: 32
-        }
-    );
-    // Antes del drawButton, pon esto:
-botonMisiones.x = canvas.width - botonMisiones.width - 20;
-botonMisiones.y = 100;
-
-// Luego dibuja el botón con:
-drawButton(
-    botonMisiones,
-    "MISIONES",
-    {
-        gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
-        borderColor: "#FFD700",
-        shadowColor: "#FFD700",
-        fontColor: "#111",
-        fontSize: 22
-    }
-);
-    // Nuevo botón MODO SUPERVIVENCIA
-    if (typeof botonSupervivencia === 'undefined') {
-        window.botonSupervivencia = {
-            x: canvas.width / 2 + 50,
-            y: canvas.height / 2 + 50,
-            width: 200,
-            height: 50,
-            hover: false
-        };
-    }
-    drawButton(
-        botonSupervivencia,
-        "SUPERVIVENCIA",
-        {
-            gradColors: botonSupervivencia.hover ? ["#FFD700", "#0F0"] : ["#0F0", "#FFD700"],
-            borderColor: "#FFD700",
-            shadowColor: "#FFD700",
-            fontColor: "#111",
-            fontSize: 30
-        }
-    );
-} else {
-    botonJugar.x = canvas.width / 2 - 100;
-    drawButton(
-        botonJugar,
-        "JUGAR",
-        {
-            gradColors: botonJugar.hover ? ["#0F0", "#FFD700"] : ["#FFD700", "#0F0"],
-            borderColor: "#FFF",
-            shadowColor: botonJugar.hover ? "#00FF00" : "#FFD700",
-            fontColor: "#111",
-            fontSize: 32
-        }
-    );
-
-    // Botón tienda
+    // --- SIEMPRE dibuja botón tienda ---
     drawButton(
         botonTienda,
         "TIENDA",
@@ -2135,7 +2069,7 @@ drawButton(
         }
     );
 
-    // Monedas bonito, debajo del botón tienda
+    // --- SIEMPRE dibuja el contador de monedas debajo del botón tienda ---
     let x = botonTienda.x;
     let y = botonTienda.y + botonTienda.height + 22;
     let w = botonTienda.width;
@@ -2173,7 +2107,70 @@ drawButton(
     ctx.shadowBlur = 5;
     ctx.fillText("🪙 " + monedas, x + w / 2, y + h / 2 + 1);
     ctx.restore();
-}
+
+    // Si ya venciste al jefe final, acomoda los botones:
+    let supervivenciaDesbloqueado = recordRonda >= 20;
+    if (supervivenciaDesbloqueado) {
+        botonJugar.x = canvas.width / 2 - 250;
+        drawButton(
+            botonJugar,
+            "JUGAR",
+            {
+                gradColors: botonJugar.hover ? ["#0F0", "#FFD700"] : ["#FFD700", "#0F0"],
+                borderColor: "#FFF",
+                shadowColor: botonJugar.hover ? "#00FF00" : "#FFD700",
+                fontColor: "#111",
+                fontSize: 32
+            }
+        );
+        botonMisiones.x = canvas.width - botonMisiones.width - 20;
+        botonMisiones.y = 100;
+        drawButton(
+            botonMisiones,
+            "MISIONES",
+            {
+                gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
+                borderColor: "#FFD700",
+                shadowColor: "#FFD700",
+                fontColor: "#111",
+                fontSize: 22
+            }
+        );
+        if (typeof botonSupervivencia === 'undefined') {
+            window.botonSupervivencia = {
+                x: canvas.width / 2 + 50,
+                y: canvas.height / 2 + 50,
+                width: 200,
+                height: 50,
+                hover: false
+            };
+        }
+        drawButton(
+            botonSupervivencia,
+            "SUPERVIVENCIA",
+            {
+                gradColors: botonSupervivencia.hover ? ["#FFD700", "#0F0"] : ["#0F0", "#FFD700"],
+                borderColor: "#FFD700",
+                shadowColor: "#FFD700",
+                fontColor: "#111",
+                fontSize: 30
+            }
+        );
+    } else {
+        botonJugar.x = canvas.width / 2 - 100;
+        drawButton(
+            botonJugar,
+            "JUGAR",
+            {
+                gradColors: botonJugar.hover ? ["#0F0", "#FFD700"] : ["#FFD700", "#0F0"],
+                borderColor: "#FFF",
+                shadowColor: botonJugar.hover ? "#00FF00" : "#FFD700",
+                fontColor: "#111",
+                fontSize: 32
+            }
+        );
+        // El botón de misiones ya se dibuja arriba, así que no lo repitas aquí.
+    }
 }
 function drawMisiones() {
     // Fondo gradiente y glow

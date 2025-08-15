@@ -1260,6 +1260,13 @@ function drawMonedasPartida() {
             }
             return;
         }
+    } else {
+        // Si es modo supervivencia, guarda el récord de supervivencia
+        let recordSupervivencia = parseInt(localStorage.getItem("recordSupervivencia") || "0");
+        if (ronda > recordSupervivencia) {
+            recordSupervivencia = ronda;
+            localStorage.setItem("recordSupervivencia", recordSupervivencia);
+        }
     }
     ronda++;
     enemigosPorRonda++;
@@ -2064,20 +2071,22 @@ if (supervivenciaDesbloqueado) {
             fontSize: 32
         }
     );
-    // Mueve el botón de misiones a la derecha
-    botonMisiones.x = canvas.width - botonMisiones.width - 20;
-    botonMisiones.y = 100;
-    drawButton(
-        botonMisiones,
-        "MISIONES",
-        {
-            gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
-            borderColor: "#FFD700",
-            shadowColor: "#FFD700",
-            fontColor: "#111",
-            fontSize: 22
-        }
-    );
+    // Antes del drawButton, pon esto:
+botonMisiones.x = canvas.width - botonMisiones.width - 20;
+botonMisiones.y = 100;
+
+// Luego dibuja el botón con:
+drawButton(
+    botonMisiones,
+    "MISIONES",
+    {
+        gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
+        borderColor: "#FFD700",
+        shadowColor: "#FFD700",
+        fontColor: "#111",
+        fontSize: 22
+    }
+);
     // Nuevo botón MODO SUPERVIVENCIA
     if (typeof botonSupervivencia === 'undefined') {
         window.botonSupervivencia = {
@@ -2344,7 +2353,6 @@ function drawMisiones() {
     });
 }
 function actualizarProgresoMision() {
-    // Refresca upgrades de la tienda antes de chequear
     upgradeDanio = localStorage.getItem("upgradeDanio") === "true";
     upgradeVelocidad = localStorage.getItem("upgradeVelocidad") === "true";
     upgradeVida = localStorage.getItem("upgradeVida") === "true";
@@ -2354,21 +2362,22 @@ function actualizarProgresoMision() {
     upgradeOtarin = localStorage.getItem("upgradeOtarin") === "true";
     upgradeGuille = localStorage.getItem("upgradeGuille") === "true";
 
-    // Si quieres separar récord de supervivencia, puedes guardar otro localStorage aquí:
-    // let recordSupervivencia = parseInt(localStorage.getItem("recordSupervivencia") || "0");
+    // Detectar récord de supervivencia (solo si modoSupervivencia está activo)
+    let recordSupervivencia = parseInt(localStorage.getItem("recordSupervivencia") || "0");
+    if (window.modoSupervivencia && ronda > recordSupervivencia) {
+        recordSupervivencia = ronda;
+        localStorage.setItem("recordSupervivencia", recordSupervivencia);
+    }
 
     misiones.forEach(mision => {
         let key = mision.nombre;
         if (!progresoMisiones[key]) progresoMisiones[key] = { progreso: 0, completada: false, reclamado: false };
         switch (mision.tipo) {
             case "ronda":
-                // Compara con recordRonda, no solo ronda actual
                 if (recordRonda >= mision.objetivo) progresoMisiones[key].completada = true;
                 break;
             case "rondaSupervivencia":
-                // Si tienes un récord de supervivencia, usa ese. Si no, usa recordRonda.
-                // if (recordSupervivencia >= mision.objetivo) progresoMisiones[key].completada = true;
-                if (recordRonda >= mision.objetivo) progresoMisiones[key].completada = true;
+                if (recordSupervivencia >= mision.objetivo) progresoMisiones[key].completada = true;
                 break;
             case "killsLanzziano":
                 progresoMisiones[key].progreso = killsLanzziano;
@@ -2407,7 +2416,6 @@ function actualizarProgresoMision() {
                 if (!window.modoSupervivencia && jefeFinalDerrotado) progresoMisiones[key].completada = true;
                 break;
         }
-        // Forzar completada si el progreso excede el objetivo
         if (progresoMisiones[key].progreso >= (mision.objetivo || 1)) {
             progresoMisiones[key].completada = true;
         }
@@ -3185,6 +3193,6 @@ else if (estado === "tienda") {
     }
 
     loop();
-};
+
 
 };

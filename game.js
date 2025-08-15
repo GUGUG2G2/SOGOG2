@@ -2052,7 +2052,6 @@ function drawBackground() {
     // Si ya venciste al jefe final, acomoda los botones:
 let supervivenciaDesbloqueado = recordRonda >= 20;
 if (supervivenciaDesbloqueado) {
-    // Corre JUGAR a la izquierda
     botonJugar.x = canvas.width / 2 - 250;
     drawButton(
         botonJugar,
@@ -2065,20 +2064,22 @@ if (supervivenciaDesbloqueado) {
             fontSize: 32
         }
     );
+    // Mueve el botón de misiones a la derecha
+    botonMisiones.x = canvas.width - botonMisiones.width - 20;
+    botonMisiones.y = 100;
     drawButton(
-    botonMisiones,
-    "MISIONES",
-    {
-        gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
-        borderColor: "#FFD700",
-        shadowColor: "#FFD700",
-        fontColor: "#111",
-        fontSize: 22
-    }
-);
+        botonMisiones,
+        "MISIONES",
+        {
+            gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
+            borderColor: "#FFD700",
+            shadowColor: "#FFD700",
+            fontColor: "#111",
+            fontSize: 22
+        }
+    );
     // Nuevo botón MODO SUPERVIVENCIA
     if (typeof botonSupervivencia === 'undefined') {
-        // Defínelo si no existe
         window.botonSupervivencia = {
             x: canvas.width / 2 + 50,
             y: canvas.height / 2 + 50,
@@ -2099,7 +2100,6 @@ if (supervivenciaDesbloqueado) {
         }
     );
 } else {
-    // Posición original del botón jugar
     botonJugar.x = canvas.width / 2 - 100;
     drawButton(
         botonJugar,
@@ -2112,7 +2112,6 @@ if (supervivenciaDesbloqueado) {
             fontSize: 32
         }
     );
-}
 
     // Botón tienda
     drawButton(
@@ -2355,15 +2354,21 @@ function actualizarProgresoMision() {
     upgradeOtarin = localStorage.getItem("upgradeOtarin") === "true";
     upgradeGuille = localStorage.getItem("upgradeGuille") === "true";
 
+    // Si quieres separar récord de supervivencia, puedes guardar otro localStorage aquí:
+    // let recordSupervivencia = parseInt(localStorage.getItem("recordSupervivencia") || "0");
+
     misiones.forEach(mision => {
         let key = mision.nombre;
         if (!progresoMisiones[key]) progresoMisiones[key] = { progreso: 0, completada: false, reclamado: false };
         switch (mision.tipo) {
             case "ronda":
-                if (ronda >= mision.objetivo) progresoMisiones[key].completada = true;
+                // Compara con recordRonda, no solo ronda actual
+                if (recordRonda >= mision.objetivo) progresoMisiones[key].completada = true;
                 break;
             case "rondaSupervivencia":
-                if (window.modoSupervivencia && ronda >= mision.objetivo) progresoMisiones[key].completada = true;
+                // Si tienes un récord de supervivencia, usa ese. Si no, usa recordRonda.
+                // if (recordSupervivencia >= mision.objetivo) progresoMisiones[key].completada = true;
+                if (recordRonda >= mision.objetivo) progresoMisiones[key].completada = true;
                 break;
             case "killsLanzziano":
                 progresoMisiones[key].progreso = killsLanzziano;
@@ -2374,8 +2379,12 @@ function actualizarProgresoMision() {
                 if (killsJhoabxi >= mision.objetivo) progresoMisiones[key].completada = true;
                 break;
             case "compras":
-                progresoMisiones[key].progreso = comprasRealizadas;
-                if (comprasRealizadas >= mision.objetivo) progresoMisiones[key].completada = true;
+                let numComprados = [
+                    upgradeDanio, upgradeVelocidad, upgradeVida, upgradeBonkChanti,
+                    upgradeMonedasX2, upgradeArmadura, upgradeOtarin, upgradeGuille
+                ].filter(Boolean).length;
+                progresoMisiones[key].progreso = numComprados;
+                if (numComprados >= mision.objetivo) progresoMisiones[key].completada = true;
                 break;
             case "comprasTotal":
                 let totalCompras = [
@@ -3176,4 +3185,6 @@ else if (estado === "tienda") {
     }
 
     loop();
+};
+
 };

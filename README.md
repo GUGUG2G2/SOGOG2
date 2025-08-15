@@ -1,2 +1,0 @@
-# SOGOG2
-TA GOOODDD

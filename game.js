@@ -2359,11 +2359,17 @@ function actualizarProgresoMision() {
     upgradeOtarin = localStorage.getItem("upgradeOtarin") === "true";
     upgradeGuille = localStorage.getItem("upgradeGuille") === "true";
 
-    // Detectar récord de supervivencia (solo si modoSupervivencia está activo)
+    // --- DEBUG: Verifica el récord de supervivencia ---
     let recordSupervivencia = parseInt(localStorage.getItem("recordSupervivencia") || "0");
     if (window.modoSupervivencia && ronda > recordSupervivencia) {
         recordSupervivencia = ronda;
         localStorage.setItem("recordSupervivencia", recordSupervivencia);
+        // DEBUG
+        console.log("Nuevo recordSupervivencia:", recordSupervivencia);
+    }
+    // DEBUG para ver si lo guarda bien
+    if (window.modoSupervivencia) {
+        console.log("ESTÁS EN MODO SUPERVIVENCIA. recordSupervivencia:", recordSupervivencia, "ronda:", ronda);
     }
 
     misiones.forEach(mision => {
@@ -2374,7 +2380,12 @@ function actualizarProgresoMision() {
                 if (recordRonda >= mision.objetivo) progresoMisiones[key].completada = true;
                 break;
             case "rondaSupervivencia":
-                if (recordSupervivencia >= mision.objetivo) progresoMisiones[key].completada = true;
+                // SOLO marcar como completada si tu recordSupervivencia es suficiente
+                if (recordSupervivencia >= mision.objetivo) {
+                    progresoMisiones[key].completada = true;
+                    // DEBUG
+                    console.log("MISIÓN SUPERVIVENCIA COMPLETADA:", key, "recordSupervivencia:", recordSupervivencia, "objetivo:", mision.objetivo);
+                }
                 break;
             case "killsLanzziano":
                 progresoMisiones[key].progreso = killsLanzziano;
@@ -2413,7 +2424,12 @@ function actualizarProgresoMision() {
                 if (!window.modoSupervivencia && jefeFinalDerrotado) progresoMisiones[key].completada = true;
                 break;
         }
-        if (progresoMisiones[key].progreso >= (mision.objetivo || 1)) {
+        // --- SOLO marcar completada si corresponde ---
+        if (
+            (mision.tipo === "ronda" && recordRonda >= (mision.objetivo || 1)) ||
+            (mision.tipo === "rondaSupervivencia" && recordSupervivencia >= (mision.objetivo || 1)) ||
+            (progresoMisiones[key].progreso >= (mision.objetivo || 1))
+        ) {
             progresoMisiones[key].completada = true;
         }
     });

@@ -345,72 +345,92 @@ function crearGuille() {
         };
     }
 
-        let tipo;
-        let rand = Math.random();
-        if (rand > 0.66) tipo = "fuerte";
-        else if (rand > 0.33) tipo = "melee";
-        else tipo = "normal";
+    // --- INCLUYE CURADOR ---
+    let tipo;
+    let rand = Math.random();
+    if (rand > 0.80) tipo = "curador";
+else if (rand > 0.66) tipo = "fuerte";
+else if (rand > 0.33) tipo = "melee";
+else tipo = "normal";
 
-        let x = 400 + Math.random() * 600;
-        let y = 100;
+    let x = 400 + Math.random() * 600;
+    let y = 100;
 
-        if (tipo === "normal") {
-            return {
-                tipo: "normal",
-                x, y,
-                width: 40,
-                height: 40,
-                color: "#8B0000",
-                vida: 100,
-                velX: 0,
-                velY: 0,
-                velocidad: 2 + 0.2 * (forJefeInvocacion ? 20 : ronda),
-                salto: -10,
-                enElSuelo: false,
-                puedeSaltar: true,
-                saltosDisponibles: 1,
-                disparoCooldown: 0,
-                invocadoPorJefe: forJefeInvocacion || false
-            };
-        } else if (tipo === "melee") {
-            return {
-                tipo: "melee",
-                x, y,
-                width: 42,
-                height: 42,
-                color: "#FF8800",
-                vida: 80 + Math.floor((forJefeInvocacion ? 20 : ronda) * 5),
-                velX: 0,
-                velY: 0,
-                velocidad: 2.5 + 0.23 * (forJefeInvocacion ? 20 : ronda),
-                salto: -11,
-                enElSuelo: false,
-                puedeSaltar: true,
-                saltosDisponibles: 1,
-                atacando: false,
-                ataqueCooldown: 0,
-                invocadoPorJefe: forJefeInvocacion || false
-            };
-        } else if (tipo === "fuerte") {
-            return {
-                tipo: "fuerte",
-                x, y,
-                width: 54,
-                height: 54,
-                color: "#4444FF",
-                vida: 200 + Math.floor((forJefeInvocacion ? 20 : ronda) * 12),
-                velX: 0,
-                velY: 0,
-                velocidad: 1.3 + 0.1 * (forJefeInvocacion ? 20 : ronda),
-                salto: -9,
-                enElSuelo: false,
-                puedeSaltar: true,
-                saltosDisponibles: 1,
-                disparoCooldown: 0,
-                invocadoPorJefe: forJefeInvocacion || false
-            };
-        }
+    if (tipo === "normal") {
+        return {
+            tipo: "normal",
+            x, y,
+            width: 40,
+            height: 40,
+            color: "#8B0000",
+            vida: 100,
+            velX: 0,
+            velY: 0,
+            velocidad: 2 + 0.2 * (forJefeInvocacion ? 20 : ronda),
+            salto: -10,
+            enElSuelo: false,
+            puedeSaltar: true,
+            saltosDisponibles: 1,
+            disparoCooldown: 0,
+            invocadoPorJefe: forJefeInvocacion || false
+        };
+    } else if (tipo === "melee") {
+        return {
+            tipo: "melee",
+            x, y,
+            width: 42,
+            height: 42,
+            color: "#FF8800",
+            vida: 80 + Math.floor((forJefeInvocacion ? 20 : ronda) * 5),
+            velX: 0,
+            velY: 0,
+            velocidad: 2.5 + 0.23 * (forJefeInvocacion ? 20 : ronda),
+            salto: -11,
+            enElSuelo: false,
+            puedeSaltar: true,
+            saltosDisponibles: 1,
+            atacando: false,
+            ataqueCooldown: 0,
+            invocadoPorJefe: forJefeInvocacion || false
+        };
+    } else if (tipo === "fuerte") {
+        return {
+            tipo: "fuerte",
+            x, y,
+            width: 54,
+            height: 54,
+            color: "#4444FF",
+            vida: 200 + Math.floor((forJefeInvocacion ? 20 : ronda) * 12),
+            velX: 0,
+            velY: 0,
+            velocidad: 1.3 + 0.1 * (forJefeInvocacion ? 20 : ronda),
+            salto: -9,
+            enElSuelo: false,
+            puedeSaltar: true,
+            saltosDisponibles: 1,
+            disparoCooldown: 0,
+            invocadoPorJefe: forJefeInvocacion || false
+        };
+    } else if (tipo === "curador") {
+        return {
+            tipo: "curador",
+            x, y,
+            width: 44,
+            height: 44,
+            color: "#E0007A", // futzia
+            vida: 150,
+            velX: 0,
+            velY: 0,
+            velocidad: 2.2,
+            salto: -11,
+            enElSuelo: false,
+            puedeSaltar: true,
+            saltosDisponibles: 1,
+            disparoCooldown: 0, // bolas futzias (curación)
+            invocadoPorJefe: forJefeInvocacion || false
+        };
     }
+}
 
     function crearEnemigosParaRonda(ronda) {
     // En modo supervivencia, jefe cada 20 rondas y enemigosPorRonda no se reinicia
@@ -1135,6 +1155,44 @@ function drawMonedasPartida() {
                     }
                 }
             }
+            // --- LÓGICA PARA CURADOR ---
+if (enemigo.tipo === "curador") {
+    if (enemigo.disparoCooldown > 0) enemigo.disparoCooldown--;
+
+    // Encuentra otro enemigo que pueda curar
+    let objetivoCura = null;
+    for (let otro of enemigos) {
+        if (
+            otro !== enemigo &&
+            otro.vida > 0 &&
+            otro.vida < (otro.vidaMax || 100) &&
+            otro.tipo !== "curador" && otro.tipo !== "jefe"
+        ) {
+            objetivoCura = otro;
+            break;
+        }
+    }
+    if (objetivoCura && enemigo.disparoCooldown === 0) {
+        let ox = enemigo.x + enemigo.width / 2;
+        let oy = enemigo.y + enemigo.height / 2;
+        let tx = objetivoCura.x + objetivoCura.width / 2;
+        let ty = objetivoCura.y + objetivoCura.height / 2;
+        let dx = tx - ox, dy = ty - oy;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        let vel = 7;
+        if (typeof window.balasCuradorasEnemigas === "undefined") window.balasCuradorasEnemigas = [];
+        window.balasCuradorasEnemigas.push({
+            x: ox,
+            y: oy,
+            vx: (dx / dist) * vel,
+            vy: (dy / dist) * vel,
+            radio: 10,
+            color: "#E0007A",
+            objetivo: objetivoCura
+        });
+        enemigo.disparoCooldown = 90; // 1.5 segundos
+    }
+}
 
             // ----- Disparo y Melee -----
             if (enemigo.tipo === "normal" || enemigo.tipo === "fuerte" || enemigo.tipo === "jefe") {
@@ -1948,16 +2006,28 @@ function drawBackground() {
                     ctx.textAlign = "center";
                     ctx.fillText("👑", enemigo.x - camaraX + enemigo.width / 2, enemigo.y - 10);
                 }
+                else if (enemigo.tipo === "curador") {
+    ctx.fillStyle = "#E0007A";
+    ctx.fillRect(enemigo.x - camaraX, enemigo.y, enemigo.width, enemigo.height);
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(enemigo.x - camaraX, enemigo.y, enemigo.width, enemigo.height);
+    ctx.font = "18px 'Press Start 2P'";
+    ctx.fillStyle = "#E0007A";
+    ctx.fillText("🩹", enemigo.x - camaraX + enemigo.width / 2, enemigo.y - 20);
+}
                 ctx.font = "18px 'Press Start 2P'";
-                ctx.fillStyle = "#000";
-                ctx.textAlign = "center";
-                ctx.fillText(
-                    enemigo.tipo === "jefe"
-                        ? "JEFE FINAL"
-                        : enemigo.tipo.toUpperCase(),
-                    enemigo.x - camaraX + enemigo.width / 2,
-                    enemigo.y - 30
-                );
+ctx.fillStyle = "#000";
+ctx.textAlign = "center";
+ctx.fillText(
+    enemigo.tipo === "jefe"
+        ? "JEFE FINAL"
+        : enemigo.tipo === "curador"
+            ? "CURADOR"
+            : enemigo.tipo.toUpperCase(),
+    enemigo.x - camaraX + enemigo.width / 2,
+    enemigo.y - 30
+);
                 ctx.font = "12px 'Press Start 2P'";
                 ctx.fillStyle = "#000";
                 ctx.textAlign = "center";
@@ -2719,6 +2789,41 @@ if (suelo.width <= canvas.width) camaraX = 0; // Si el escenario es más pequeñ
             drawEnemigos();
             drawBalas();
             drawBalasEnemigas();
+            // Dibuja y procesa balasCuradorasEnemigas
+if (typeof window.balasCuradorasEnemigas === "undefined") window.balasCuradorasEnemigas = [];
+for (let i = window.balasCuradorasEnemigas.length - 1; i >= 0; i--) {
+    let bala = window.balasCuradorasEnemigas[i];
+    bala.x += bala.vx;
+    bala.y += bala.vy;
+    // Dibuja
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(bala.x - camaraX, bala.y, bala.radio, 0, Math.PI * 2);
+    ctx.fillStyle = bala.color;
+    ctx.globalAlpha = 0.86;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#FFF";
+    ctx.stroke();
+    ctx.restore();
+
+    // Colisión con objetivo: cura 20 vida
+    if (
+        bala.objetivo &&
+        bala.objetivo.vida > 0 &&
+        Math.abs(bala.x - (bala.objetivo.x + bala.objetivo.width / 2)) < bala.objetivo.width / 2 + bala.radio &&
+        Math.abs(bala.y - (bala.objetivo.y + bala.objetivo.height / 2)) < bala.objetivo.height / 2 + bala.radio
+    ) {
+        bala.objetivo.vida += 20;
+        if (bala.objetivo.vida > (bala.objetivo.vidaMax || 100)) bala.objetivo.vida = (bala.objetivo.vidaMax || 100);
+        window.balasCuradorasEnemigas.splice(i, 1);
+        continue;
+    }
+    // Fuera del canvas
+    if (bala.x < 0 || bala.x > suelo.width || bala.y < 0 || bala.y > canvas.height) {
+        window.balasCuradorasEnemigas.splice(i, 1);
+    }
+}
             drawParticulas();
             
 console.log("BonkChanti:", bonkchanti, "upgrade:", upgradeBonkChanti);

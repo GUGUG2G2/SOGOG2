@@ -2174,7 +2174,7 @@ drawButton(
     ctx.fillText("🪙 " + monedas, x + w / 2, y + h / 2 + 1);
     ctx.restore();
 }
-
+}
 function drawMisiones() {
     // Fondo gradiente y glow
     ctx.save();
@@ -3193,6 +3193,7 @@ else if (estado === "tienda") {
     }
 
     loop();
+
 
 
 };

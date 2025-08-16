@@ -198,10 +198,10 @@ const flechaDerMisiones = { x: 830, y: 260, width: 50, height: 50, hover: false 
 const btnSalirMisiones = { x: 380, y: 400, width: 200, height: 50, hover: false };
 
 // Contadores para misiones de kills y compras
-let killsLanzziano = 0;
-let killsJhoabxi = 0;
-let killsGuille = 0;
-let congelacionesOtarin = 0;
+let killsLanzziano = parseInt(localStorage.getItem("killsLanzziano") || "0");
+let killsJhoabxi = parseInt(localStorage.getItem("killsJhoabxi") || "0");
+let killsGuille = parseInt(localStorage.getItem("killsGuille") || "0");
+let congelacionesOtarin = parseInt(localStorage.getItem("congelacionesOtarin") || "0");
 let comprasRealizadas = 0;
 
     // ===== ELEMENTOS DEL JUEGO =====
@@ -542,7 +542,8 @@ if (e.code === "KeyM") {
 
                 // --- BLOQUE ADICIONAL: Sumar kills a Lanzziano ---
                 killsLanzziano++;
-                actualizarProgresoMision();
+localStorage.setItem("killsLanzziano", killsLanzziano);
+actualizarProgresoMision();
             }
         }
     }
@@ -1394,7 +1395,8 @@ if (enemigo.tipo === "curador") {
                         // --- BLOQUE ADICIONAL: Sumar kills a Jhoabxi ---
                         if (bala.color === "#003366") { // Solo balas azules de Jhoabxi
                             killsJhoabxi++;
-                            actualizarProgresoMision();
+localStorage.setItem("killsJhoabxi", killsJhoabxi);
+actualizarProgresoMision();
                         }
                     }
 
@@ -3380,10 +3382,10 @@ for (let i = rayosGuille.length - 1; i >= 0; i--) {
         for (let enemigo of enemigos) {
     if (
         enemigo.vida > 0 &&
-        Math.abs(enemigo.x + enemigo.width/2 - tijera.x) < 29 &&
-        Math.abs(enemigo.y + enemigo.height/2 - tijera.y) < 29
+        Math.abs(enemigo.x + enemigo.width/2 - rayo.x) < 120 &&
+        Math.abs(enemigo.y + enemigo.height/2 - (rayo.objetivo.y + rayo.objetivo.height/2)) < 120
     ) {
-        enemigo.vida -= 30;
+        enemigo.vida -= 50;
         if (enemigo.vida < 0) enemigo.vida = 0;
 
         // SUMA MONEDAS (X2 si tienes el upgrade)
@@ -3460,10 +3462,10 @@ for (let i = tijerasGuille.length - 1; i >= 0; i--) {
     for (let enemigo of enemigos) {
     if (
         enemigo.vida > 0 &&
-        Math.abs(enemigo.x + enemigo.width/2 - rayo.x) < 120 &&
-        Math.abs(enemigo.y + enemigo.height/2 - (rayo.objetivo.y + rayo.objetivo.height/2)) < 120
+        Math.abs(enemigo.x + enemigo.width/2 - tijera.x) < 29 &&
+        Math.abs(enemigo.y + enemigo.height/2 - tijera.y) < 29
     ) {
-        enemigo.vida -= 50;
+        enemigo.vida -= 30;
         if (enemigo.vida < 0) enemigo.vida = 0;
 
         // SUMA MONEDAS (X2 si tienes el upgrade)

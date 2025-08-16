@@ -200,6 +200,8 @@ const btnSalirMisiones = { x: 380, y: 400, width: 200, height: 50, hover: false 
 // Contadores para misiones de kills y compras
 let killsLanzziano = 0;
 let killsJhoabxi = 0;
+let killsGuille = 0;
+let congelacionesOtarin = 0;
 let comprasRealizadas = 0;
 
     // ===== ELEMENTOS DEL JUEGO =====
@@ -440,7 +442,17 @@ else tipo = "normal";
     }
     let arr = [];
     for (let i = 0; i < enemigosPorRonda; i++) {
-        arr.push(crearUnEnemigo(ronda));
+        let enemigo = crearUnEnemigo(ronda);
+
+        // SUMA VIDA EXTRA SEGÚN LA RONDA (excepto jefe)
+        if (enemigo.tipo !== "jefe") {
+            let vidaExtra = 7 * ronda;
+            enemigo.vida += vidaExtra;
+            if (typeof enemigo.vidaMax !== "undefined") {
+                enemigo.vidaMax += vidaExtra;
+            }
+        }
+        arr.push(enemigo);
     }
     return arr;
 }
@@ -582,6 +594,13 @@ if (e.code === "KeyM") {
             botonSupervivencia.hover = mx > botonSupervivencia.x && mx < botonSupervivencia.x + botonSupervivencia.width &&
                 my > botonSupervivencia.y && my < botonSupervivencia.y + botonSupervivencia.height;
         }
+        if (estado === "menu" && window.botonContadorKills)
+    window.botonContadorKills.hover = mx > window.botonContadorKills.x && mx < window.botonContadorKills.x + window.botonContadorKills.width &&
+        my > window.botonContadorKills.y && my < window.botonContadorKills.y + window.botonContadorKills.height;
+
+if (estado === "contadorKills" && window.btnSalirKills)
+    window.btnSalirKills.hover = mx > window.btnSalirKills.x && mx < window.btnSalirKills.x + window.btnSalirKills.width &&
+        my > window.btnSalirKills.y && my < window.btnSalirKills.y + window.btnSalirKills.height;
     } else if (estado === "misiones") {
         flechaIzqMisiones.hover = mx > flechaIzqMisiones.x && mx < flechaIzqMisiones.x + flechaIzqMisiones.width &&
             my > flechaIzqMisiones.y && my < flechaIzqMisiones.y + flechaIzqMisiones.height;
@@ -707,6 +726,16 @@ if (estado === "misiones") {
         resetHovers();
         return;
     } 
+    if (estado === "menu" && window.botonContadorKills && window.botonContadorKills.hover) {
+    estado = "contadorKills";
+    resetHovers();
+    return;
+}
+if (estado === "contadorKills" && window.btnSalirKills && window.btnSalirKills.hover) {
+    estado = "menu";
+    resetHovers();
+    return;
+}
     else if (estado === "cinematica" && botonSaltar.hover) {
         estado = "jugando";
         resetHovers();
@@ -1190,7 +1219,7 @@ if (enemigo.tipo === "curador") {
             color: "#E0007A",
             objetivo: objetivoCura
         });
-        enemigo.disparoCooldown = 90; // 1.5 segundos
+        enemigo.disparoCooldown = 60; // 1 segundos
     }
 }
 
@@ -1807,24 +1836,50 @@ function drawMountains() {
 // --- Árboles y arbustos alineados con el suelo ---
 function drawTree(x, sueloY) {
     ctx.save();
-    // Tronco
+
+    // Tamaño y centro base
+    const base = 120;   // ancho base del pino
+    const centro = x + base / 2;
+
+    // Tronco pegado al suelo
+    const troncoAlto = 34, troncoAncho = 22;
     ctx.fillStyle = "#a86026";
-    ctx.fillRect(x + 18, sueloY - 65, 15, 40);
-    // Copa
+    ctx.fillRect(centro - troncoAncho / 2, sueloY - troncoAlto, troncoAncho, troncoAlto);
+
+    // Hoja 1 (más grande, abajo)
     ctx.beginPath();
-    ctx.arc(x + 26, sueloY - 75, 28, 0, Math.PI * 2);
-    let grad = ctx.createRadialGradient(x + 26, sueloY - 75, 10, x + 26, sueloY - 75, 28);
-    grad.addColorStop(0, "#b9ff9e");
-    grad.addColorStop(0.6, "#53be1c");
-    grad.addColorStop(1, "#2e7e21");
-    ctx.fillStyle = grad;
+    ctx.moveTo(centro, sueloY - troncoAlto - 0);                // punta arriba centro
+    ctx.lineTo(x, sueloY - troncoAlto);                         // izquierda abajo
+    ctx.lineTo(x + base, sueloY - troncoAlto);                  // derecha abajo
+    ctx.closePath();
+    ctx.fillStyle = "#2e7e21";
     ctx.shadowColor = "#53be1c";
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur = 24;
     ctx.globalAlpha = 0.97;
     ctx.fill();
+
+    // Hoja 2 (mediana, al medio)
+    ctx.beginPath();
+    ctx.moveTo(centro, sueloY - troncoAlto - 36);               // punta arriba centro
+    ctx.lineTo(x + 20, sueloY - troncoAlto - 0);                // izquierda abajo
+    ctx.lineTo(x + base - 20, sueloY - troncoAlto - 0);         // derecha abajo
+    ctx.closePath();
+    ctx.fillStyle = "#53be1c";
+    ctx.shadowBlur = 18;
+    ctx.fill();
+
+    // Hoja 3 (pequeña, arriba del todo)
+    ctx.beginPath();
+    ctx.moveTo(centro, sueloY - troncoAlto - 72);               // punta arriba centro
+    ctx.lineTo(x + 38, sueloY - troncoAlto - 36);               // izquierda abajo
+    ctx.lineTo(x + base - 38, sueloY - troncoAlto - 36);        // derecha abajo
+    ctx.closePath();
+    ctx.fillStyle = "#b9ff9e";
+    ctx.shadowBlur = 10;
+    ctx.fill();
+
     ctx.restore();
 }
-
 function drawBush(x, sueloY) {
     ctx.save();
     ctx.beginPath();
@@ -2112,7 +2167,7 @@ ctx.fillText(
     ctx.fillText("RÉCORD DE RONDA: " + recordRonda, canvas.width / 2, 190);
     ctx.restore();
 
-    // Instrucciones y controles, ahora 100% centrado y con espacios agradables
+    // Instrucciones y controles
     ctx.save();
     ctx.textAlign = "center";
     ctx.shadowBlur = 0;
@@ -2178,7 +2233,22 @@ ctx.fillText(
     ctx.fillText("🪙 " + monedas, x + w / 2, y + h / 2 + 1);
     ctx.restore();
 
-    // Si ya venciste al jefe final, acomoda los botones:
+    // --- SIEMPRE dibuja el botón de MISIONES ---
+    botonMisiones.x = canvas.width - botonMisiones.width - 20;
+    botonMisiones.y = 100;
+    drawButton(
+        botonMisiones,
+        "MISIONES",
+        {
+            gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
+            borderColor: "#FFD700",
+            shadowColor: "#FFD700",
+            fontColor: "#111",
+            fontSize: 22
+        }
+    );
+
+    // Botones de jugar y supervivencia según desbloqueo
     let supervivenciaDesbloqueado = recordRonda >= 20;
     if (supervivenciaDesbloqueado) {
         botonJugar.x = canvas.width / 2 - 250;
@@ -2191,19 +2261,6 @@ ctx.fillText(
                 shadowColor: botonJugar.hover ? "#00FF00" : "#FFD700",
                 fontColor: "#111",
                 fontSize: 32
-            }
-        );
-        botonMisiones.x = canvas.width - botonMisiones.width - 20;
-        botonMisiones.y = 100;
-        drawButton(
-            botonMisiones,
-            "MISIONES",
-            {
-                gradColors: botonMisiones.hover ? ["#FA0", "#FFD700"] : ["#FFD700", "#FA0"],
-                borderColor: "#FFD700",
-                shadowColor: "#FFD700",
-                fontColor: "#111",
-                fontSize: 22
             }
         );
         if (typeof botonSupervivencia === 'undefined') {
@@ -2239,8 +2296,27 @@ ctx.fillText(
                 fontSize: 32
             }
         );
-        // El botón de misiones ya se dibuja arriba, así que no lo repitas aquí.
     }
+    // ---- AGREGADO: Botón CONTADOR DE KILLS abajo a la derecha ----
+    let botonContadorKills = {
+        x: canvas.width - 220,
+        y: canvas.height - 80,
+        width: 180,
+        height: 54,
+        hover: false
+    };
+    drawButton(
+        botonContadorKills,
+        "CONTADOR DE KILLS",
+        {
+            gradColors: botonContadorKills.hover ? ["#FFD700", "#23264a"] : ["#23264a", "#FFD700"],
+            borderColor: "#FFD700",
+            fontColor: "#111",
+            fontSize: 19
+        }
+    );
+    window.botonContadorKills = botonContadorKills;
+
 }
 function drawMisiones() {
     // Fondo gradiente y glow
@@ -2418,6 +2494,142 @@ function drawMisiones() {
         shadowColor: "#23f3ea",
         borderWidth: 3
     });
+}
+function drawContadorKills() {
+    ctx.save();
+    ctx.globalAlpha = 0.97;
+    ctx.fillStyle = "rgba(0,0,0,0.84)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Título
+    ctx.font = "bold 50px 'Press Start 2P', Arial";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "#FFD700";
+    ctx.shadowBlur = 32;
+    ctx.fillText("CONTADOR DE KILLS", canvas.width / 2, 95);
+    ctx.shadowBlur = 0;
+
+    // Lanzziano
+    let iconY = 180;
+    ctx.save();
+    ctx.fillStyle = "#FFFF99";
+    ctx.fillRect(120, iconY, 38, 38);
+    ctx.restore();
+    ctx.font = "22px 'Press Start 2P'";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#FFD700";
+    ctx.fillText("Lanzziano", 170, iconY + 29);
+
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#FFD700";
+    ctx.fillStyle = "#23264a";
+    ctx.beginPath();
+    ctx.rect(320, iconY, 280, 42);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = "26px 'Press Start 2P'";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText("Kills: " + killsLanzziano, 460, iconY + 29);
+
+    // Jhoabxi
+    iconY += 64;
+    ctx.save();
+    ctx.fillStyle = "#003366";
+    ctx.fillRect(120, iconY, 38, 38);
+    ctx.restore();
+    ctx.font = "22px 'Press Start 2P'";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#0FF";
+    ctx.fillText("Jhoabxi", 170, iconY + 29);
+
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#0FF";
+    ctx.fillStyle = "#23264a";
+    ctx.beginPath();
+    ctx.rect(320, iconY, 280, 42);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = "26px 'Press Start 2P'";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText("Kills: " + killsJhoabxi, 460, iconY + 29);
+
+    // Guille
+    iconY += 64;
+    ctx.save();
+    ctx.fillStyle = "#FF2222";
+    ctx.fillRect(120, iconY, 38, 38);
+    ctx.restore();
+    ctx.font = "22px 'Press Start 2P'";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#FF2222";
+    ctx.fillText("Guille", 170, iconY + 29);
+
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#FF2222";
+    ctx.fillStyle = "#23264a";
+    ctx.beginPath();
+    ctx.rect(320, iconY, 280, 42);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = "26px 'Press Start 2P'";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText("Kills: " + killsGuille, 460, iconY + 29);
+
+    // Otarin
+    iconY += 64;
+    ctx.save();
+    ctx.fillStyle = "#6AEAFF";
+    ctx.fillRect(120, iconY, 38, 38);
+    ctx.restore();
+    ctx.font = "22px 'Press Start 2P'";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#6AEAFF";
+    ctx.fillText("Otarin", 170, iconY + 29);
+
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#6AEAFF";
+    ctx.fillStyle = "#23264a";
+    ctx.beginPath();
+    ctx.rect(320, iconY, 280, 42);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = "23px 'Press Start 2P'";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText("Congelaciones: " + congelacionesOtarin, 460, iconY + 29);
+
+    // Botón salir
+    let btnSalirKills = {
+        x: canvas.width / 2 - 128,
+        y: iconY + 82,
+        width: 256,
+        height: 56,
+        hover: false
+    };
+    drawButton(
+        btnSalirKills,
+        "SALIR",
+        {
+            gradColors: btnSalirKills.hover ? ["#FFD700", "#23264a"] : ["#FFD700", "#23264a"],
+            borderColor: "#FFD700",
+            fontColor: "#111",
+            fontSize: 36
+        }
+    );
+    window.btnSalirKills = btnSalirKills;
+    ctx.restore();
 }
 function actualizarProgresoMision() {
     upgradeDanio = localStorage.getItem("upgradeDanio") === "true";
@@ -2732,7 +2944,10 @@ function actualizarProgresoMision() {
         } else if (estado === "cinematica") {
             mostrarFraseCinematica();
         } 
-        
+        if (estado === "contadorKills") {
+    drawContadorKills();
+    return;
+}
         if (estado === "misiones") {
     drawMisiones();
     //no return aquí, sigue el loop normal
@@ -3019,16 +3234,21 @@ for (let i = balasHielo.length - 1; i >= 0; i--) {
 
     // Colisión con el objetivo (solo si sigue vivo y NO congelado)
     if (
-        bala.objetivo &&
-        bala.objetivo.vida > 0 &&
-        !bala.objetivo.congelado &&
-        Math.abs(bala.x - (bala.objetivo.x + bala.objetivo.width/2)) < bala.objetivo.width/2 + bala.radio &&
-        Math.abs(bala.y - (bala.objetivo.y + bala.objetivo.height/2)) < bala.objetivo.height/2 + bala.radio
-    ) {
-        bala.objetivo.congelado = 150; // Congelado por 2,5 segundos
-        balasHielo.splice(i, 1);
-        continue;
-    }
+    bala.objetivo &&
+    bala.objetivo.vida > 0 &&
+    !bala.objetivo.congelado &&
+    Math.abs(bala.x - (bala.objetivo.x + bala.objetivo.width/2)) < bala.objetivo.width/2 + bala.radio &&
+    Math.abs(bala.y - (bala.objetivo.y + bala.objetivo.height/2)) < bala.objetivo.height/2 + bala.radio
+) {
+    bala.objetivo.congelado = 150; // Congelado por 2,5 segundos
+
+    // ---- SUMA CONGELACIÓN DE OTARIN ----
+    congelacionesOtarin++;
+    localStorage.setItem("congelacionesOtarin", congelacionesOtarin);
+
+    balasHielo.splice(i, 1);
+    continue;
+}
     // Fuera del canvas
     if (bala.x < 0 || bala.x > suelo.width || bala.y < 0 || bala.y > canvas.height) {
         balasHielo.splice(i, 1);
@@ -3158,29 +3378,33 @@ for (let i = rayosGuille.length - 1; i >= 0; i--) {
     if (rayo.y > rayo.objetivo.y && rayo.tiempo > 1) {
         // Daño en área más grande (120px radio en X y Y)
         for (let enemigo of enemigos) {
-            if (
-                enemigo.vida > 0 &&
-                Math.abs(enemigo.x + enemigo.width/2 - rayo.x) < 120 &&
-                Math.abs(enemigo.y + enemigo.height/2 - (rayo.objetivo.y + rayo.objetivo.height/2)) < 120
-            ) {
-                enemigo.vida -= 50;
-                if (enemigo.vida < 0) enemigo.vida = 0;
+    if (
+        enemigo.vida > 0 &&
+        Math.abs(enemigo.x + enemigo.width/2 - tijera.x) < 29 &&
+        Math.abs(enemigo.y + enemigo.height/2 - tijera.y) < 29
+    ) {
+        enemigo.vida -= 30;
+        if (enemigo.vida < 0) enemigo.vida = 0;
 
-                // SUMA MONEDAS (X2 si tienes el upgrade)
-                let multiplicador = upgradeMonedasX2 ? 2 : 1;
-                if (!enemigo.sueltoMoneda && enemigo.vida <= 0) {
-                    if (enemigo.tipo === "jefe") {
-                        monedas += 50 * multiplicador;
-                        monedasRecoleccionPartida += 50 * multiplicador;
-                    } else {
-                        monedas += 1 * multiplicador;
-                        monedasRecoleccionPartida += 1 * multiplicador;
-                    }
-                    enemigo.sueltoMoneda = true;
-                    localStorage.setItem("monedas", monedas);
-                }
+        // SUMA MONEDAS (X2 si tienes el upgrade)
+        let multiplicador = upgradeMonedasX2 ? 2 : 1;
+        if (!enemigo.sueltoMoneda && enemigo.vida <= 0) {
+            if (enemigo.tipo === "jefe") {
+                monedas += 50 * multiplicador;
+                monedasRecoleccionPartida += 50 * multiplicador;
+            } else {
+                monedas += 1 * multiplicador;
+                monedasRecoleccionPartida += 1 * multiplicador;
             }
+            enemigo.sueltoMoneda = true;
+            localStorage.setItem("monedas", monedas);
+
+            // ---- SUMA KILL DE GUILLE ----
+            killsGuille++;
+            localStorage.setItem("killsGuille", killsGuille);
         }
+    }
+}
         // Partículas de explosión grandes
         for (let j = 0; j < 36; j++) {
             particulas.push({
@@ -3234,29 +3458,33 @@ for (let i = tijerasGuille.length - 1; i >= 0; i--) {
 
     // Daño a enemigos + suma monedas
     for (let enemigo of enemigos) {
-        if (
-            enemigo.vida > 0 &&
-            Math.abs(enemigo.x + enemigo.width/2 - tijera.x) < 29 &&
-            Math.abs(enemigo.y + enemigo.height/2 - tijera.y) < 29
-        ) {
-            enemigo.vida -= 30;
-            if (enemigo.vida < 0) enemigo.vida = 0;
+    if (
+        enemigo.vida > 0 &&
+        Math.abs(enemigo.x + enemigo.width/2 - rayo.x) < 120 &&
+        Math.abs(enemigo.y + enemigo.height/2 - (rayo.objetivo.y + rayo.objetivo.height/2)) < 120
+    ) {
+        enemigo.vida -= 50;
+        if (enemigo.vida < 0) enemigo.vida = 0;
 
-            // SUMA MONEDAS (X2 si tienes el upgrade)
-            let multiplicador = upgradeMonedasX2 ? 2 : 1;
-            if (!enemigo.sueltoMoneda && enemigo.vida <= 0) {
-                if (enemigo.tipo === "jefe") {
-                    monedas += 50 * multiplicador;
-                    monedasRecoleccionPartida += 50 * multiplicador;
-                } else {
-                    monedas += 1 * multiplicador;
-                    monedasRecoleccionPartida += 1 * multiplicador;
-                }
-                enemigo.sueltoMoneda = true;
-                localStorage.setItem("monedas", monedas);
+        // SUMA MONEDAS (X2 si tienes el upgrade)
+        let multiplicador = upgradeMonedasX2 ? 2 : 1;
+        if (!enemigo.sueltoMoneda && enemigo.vida <= 0) {
+            if (enemigo.tipo === "jefe") {
+                monedas += 50 * multiplicador;
+                monedasRecoleccionPartida += 50 * multiplicador;
+            } else {
+                monedas += 1 * multiplicador;
+                monedasRecoleccionPartida += 1 * multiplicador;
             }
+            enemigo.sueltoMoneda = true;
+            localStorage.setItem("monedas", monedas);
+
+            // ---- SUMA KILL DE GUILLE ----
+            killsGuille++;
+            localStorage.setItem("killsGuille", killsGuille);
         }
     }
+}
     // Fuera del canvas
     if (tijera.x < 0 || tijera.x > suelo.width || tijera.y < 0 || tijera.y > canvas.height) {
         tijerasGuille.splice(i, 1);

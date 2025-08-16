@@ -2499,138 +2499,178 @@ function drawMisiones() {
 }
 function drawContadorKills() {
     ctx.save();
-    ctx.globalAlpha = 0.97;
-    ctx.fillStyle = "rgba(0,0,0,0.84)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Título
-    ctx.font = "bold 50px 'Press Start 2P', Arial";
+    // Panel full screen retro
+    ctx.shadowColor = "#00fff7";
+    ctx.shadowBlur = 60;
+    ctx.fillStyle = "rgba(22,28,44, 0.99)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.shadowBlur = 0;
+
+    // Título centrado arriba
+    ctx.font = "bold 48px 'Press Start 2P', Arial";
     ctx.textAlign = "center";
     ctx.fillStyle = "#fff";
     ctx.shadowColor = "#FFD700";
-    ctx.shadowBlur = 32;
-    ctx.fillText("CONTADOR DE KILLS", canvas.width / 2, 95);
+    ctx.shadowBlur = 22;
+    ctx.fillText("CONTADOR DE KILLS", canvas.width / 2, 70);
     ctx.shadowBlur = 0;
 
+    // Layout separado horizontalmente
+    let centroY = canvas.height / 2 - 60;
+    let sepY = 64;
+    let iconSize = 28;
+    let nombreFont = "bold 26px 'Press Start 2P'";
+    let boxFont = "bold 22px 'Press Start 2P'";
+    let boxW = 192, boxH = 38;
+
+    // Columnas bien separadas
+    let nombreX = 140;
+    let iconX = nombreX - iconSize - 18;
+    let boxX = canvas.width - boxW - 140;
+
     // Lanzziano
-    let iconY = 180;
     ctx.save();
     ctx.fillStyle = "#FFFF99";
-    ctx.fillRect(120, iconY, 38, 38);
-    ctx.restore();
-    ctx.font = "22px 'Press Start 2P'";
+    ctx.fillRect(iconX, centroY, iconSize, iconSize);
+    ctx.font = nombreFont;
+    ctx.fillStyle = "#FFFF99";
+    ctx.shadowColor = "#FFFF99";
+    ctx.shadowBlur = 9;
     ctx.textAlign = "left";
-    ctx.fillStyle = "#FFD700";
-    ctx.fillText("Lanzziano", 170, iconY + 29);
+    ctx.fillText("Lanzziano", nombreX, centroY + iconSize - 2);
 
+    // Caja contador derecha
     ctx.save();
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.strokeStyle = "#FFD700";
-    ctx.fillStyle = "#23264a";
+    ctx.fillStyle = "#22263a";
     ctx.beginPath();
-    ctx.rect(320, iconY, 280, 42);
+    ctx.roundRect(boxX, centroY - 2, boxW, boxH, 13);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-    ctx.font = "26px 'Press Start 2P'";
-    ctx.fillStyle = "#fff";
+
+    ctx.font = boxFont;
     ctx.textAlign = "center";
-    ctx.fillText("Kills: " + killsLanzziano, 460, iconY + 29);
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "#FFD700";
+    ctx.shadowBlur = 10;
+    ctx.fillText("Kills: " + killsLanzziano, boxX + boxW / 2, centroY + boxH / 2 + 6);
+    ctx.restore();
 
     // Jhoabxi
-    iconY += 64;
+    let jy = centroY + sepY;
     ctx.save();
     ctx.fillStyle = "#003366";
-    ctx.fillRect(120, iconY, 38, 38);
-    ctx.restore();
-    ctx.font = "22px 'Press Start 2P'";
+    ctx.fillRect(iconX, jy, iconSize, iconSize);
+    ctx.font = nombreFont;
+    ctx.fillStyle = "#0ff";
+    ctx.shadowColor = "#0ff";
+    ctx.shadowBlur = 7;
     ctx.textAlign = "left";
-    ctx.fillStyle = "#0FF";
-    ctx.fillText("Jhoabxi", 170, iconY + 29);
+    ctx.fillText("Jhoabxi", nombreX, jy + iconSize - 2);
 
     ctx.save();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#0FF";
-    ctx.fillStyle = "#23264a";
+    ctx.lineWidth = 3.5;
+    ctx.strokeStyle = "#0ff";
+    ctx.fillStyle = "#22263a";
     ctx.beginPath();
-    ctx.rect(320, iconY, 280, 42);
+    ctx.roundRect(boxX, jy - 2, boxW, boxH, 13);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-    ctx.font = "26px 'Press Start 2P'";
-    ctx.fillStyle = "#fff";
+
+    ctx.font = boxFont;
     ctx.textAlign = "center";
-    ctx.fillText("Kills: " + killsJhoabxi, 460, iconY + 29);
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "#0ff";
+    ctx.shadowBlur = 10;
+    ctx.fillText("Kills: " + killsJhoabxi, boxX + boxW / 2, jy + boxH / 2 + 6);
+    ctx.restore();
 
     // Guille
-    iconY += 64;
+    let gy = jy + sepY;
     ctx.save();
     ctx.fillStyle = "#FF2222";
-    ctx.fillRect(120, iconY, 38, 38);
-    ctx.restore();
-    ctx.font = "22px 'Press Start 2P'";
-    ctx.textAlign = "left";
+    ctx.fillRect(iconX, gy, iconSize, iconSize);
+    ctx.font = nombreFont;
     ctx.fillStyle = "#FF2222";
-    ctx.fillText("Guille", 170, iconY + 29);
+    ctx.shadowColor = "#FF2222";
+    ctx.shadowBlur = 7;
+    ctx.textAlign = "left";
+    ctx.fillText("Guille", nombreX, gy + iconSize - 2);
 
     ctx.save();
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.strokeStyle = "#FF2222";
-    ctx.fillStyle = "#23264a";
+    ctx.fillStyle = "#22263a";
     ctx.beginPath();
-    ctx.rect(320, iconY, 280, 42);
+    ctx.roundRect(boxX, gy - 2, boxW, boxH, 13);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-    ctx.font = "26px 'Press Start 2P'";
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "center";
-    ctx.fillText("Kills: " + killsGuille, 460, iconY + 29);
 
-    // Otarin
-    iconY += 64;
+    ctx.font = boxFont;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "#FF2222";
+    ctx.shadowBlur = 10;
+    ctx.fillText("Kills: " + killsGuille, boxX + boxW / 2, gy + boxH / 2 + 6);
+    ctx.restore();
+
+    // Otarin - Congelaciones junto en la caja de la derecha
+    let oy = gy + sepY;
     ctx.save();
     ctx.fillStyle = "#6AEAFF";
-    ctx.fillRect(120, iconY, 38, 38);
-    ctx.restore();
-    ctx.font = "22px 'Press Start 2P'";
+    ctx.fillRect(iconX, oy, iconSize, iconSize);
+    ctx.font = nombreFont;
+    ctx.fillStyle = "#6AEAFF";
+    ctx.shadowColor = "#6AEAFF";
+    ctx.shadowBlur = 7;
     ctx.textAlign = "left";
-    ctx.fillStyle = "#6AEAFF";
-    ctx.fillText("Otarin", 170, iconY + 29);
+    ctx.fillText("Otarin", nombreX, oy + iconSize - 2);
 
     ctx.save();
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.strokeStyle = "#6AEAFF";
-    ctx.fillStyle = "#23264a";
+    ctx.fillStyle = "#22263a";
     ctx.beginPath();
-    ctx.rect(320, iconY, 280, 42);
+    ctx.roundRect(boxX, oy - 2, boxW, boxH, 13);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
-    ctx.font = "23px 'Press Start 2P'";
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "center";
-    ctx.fillText("Congelaciones: " + congelacionesOtarin, 460, iconY + 29);
 
-    // Botón salir
+    ctx.font = boxFont;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "#6AEAFF";
+    ctx.shadowBlur = 10;
+    ctx.fillText("Congelaciones: " + congelacionesOtarin, boxX + boxW / 2, oy + boxH / 2 + 6);
+    ctx.restore();
+
+    // Botón salir centrado abajo
+    let salirY = oy + sepY + 40;
     let btnSalirKills = {
-        x: canvas.width / 2 - 128,
-        y: iconY + 82,
-        width: 256,
-        height: 56,
-        hover: false
+        x: canvas.width / 2 - 100,
+        y: salirY,
+        width: 200,
+        height: 48,
+        hover: window.btnSalirKills ? window.btnSalirKills.hover : false
     };
     drawButton(
         btnSalirKills,
         "SALIR",
         {
-            gradColors: btnSalirKills.hover ? ["#FFD700", "#23264a"] : ["#FFD700", "#23264a"],
+            gradColors: btnSalirKills.hover ? ["#FFD700", "#39e279"] : ["#FFD700", "#23264a"],
             borderColor: "#FFD700",
-            fontColor: "#111",
-            fontSize: 36
+            fontColor: btnSalirKills.hover ? "#222" : "#111",
+            fontSize: 30,
+            shadowColor: btnSalirKills.hover ? "#39e279" : "#FFD700"
         }
     );
     window.btnSalirKills = btnSalirKills;
+
     ctx.restore();
 }
 function actualizarProgresoMision() {

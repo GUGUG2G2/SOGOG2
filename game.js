@@ -573,9 +573,8 @@ actualizarProgresoMision();
     const mx = (e.clientX - rect.left) * scaleX;
     const my = (e.clientY - rect.top) * scaleY;
 
-    // Siempre limpia TODOS los hovers posibles al inicio
-    if (window.botonContadorKills) window.botonContadorKills.hover = false;
-    if (window.btnSalirKills) window.btnSalirKills.hover = false;
+    // --- Primero resetea TODOS los hovers ---
+    resetHovers();
 
     // --- Botón CONTADOR DE KILLS en menú ---
     if (estado === "menu" && window.botonContadorKills) {
@@ -601,7 +600,7 @@ actualizarProgresoMision();
         }
     }
 
-    resetHovers();
+  
     if (estado === "cinematica") {
         botonSaltar.hover = mx > botonSaltar.x && mx < botonSaltar.x + botonSaltar.width &&
             my > botonSaltar.y && my < botonSaltar.y + botonSaltar.height;
@@ -620,8 +619,7 @@ actualizarProgresoMision();
         if (typeof botonSupervivencia !== 'undefined' && recordRonda >= 20) {
             botonSupervivencia.hover = mx > botonSupervivencia.x && mx < botonSupervivencia.x + botonSupervivencia.width &&
                 my > botonSupervivencia.y && my < botonSupervivencia.y + botonSupervivencia.height;
-    
-            }}else if (estado === "misiones") {
+        }}else if (estado === "misiones") {
         flechaIzqMisiones.hover = mx > flechaIzqMisiones.x && mx < flechaIzqMisiones.x + flechaIzqMisiones.width &&
             my > flechaIzqMisiones.y && my < flechaIzqMisiones.y + flechaIzqMisiones.height;
         flechaDerMisiones.hover = mx > flechaDerMisiones.x && mx < flechaDerMisiones.x + flechaDerMisiones.width &&

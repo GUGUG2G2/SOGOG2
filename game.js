@@ -573,8 +573,35 @@ actualizarProgresoMision();
     const mx = (e.clientX - rect.left) * scaleX;
     const my = (e.clientY - rect.top) * scaleY;
 
-    resetHovers();
+    // Siempre limpia TODOS los hovers posibles al inicio
+    if (window.botonContadorKills) window.botonContadorKills.hover = false;
+    if (window.btnSalirKills) window.btnSalirKills.hover = false;
 
+    // --- Botón CONTADOR DE KILLS en menú ---
+    if (estado === "menu" && window.botonContadorKills) {
+        if (
+            mx > window.botonContadorKills.x &&
+            mx < window.botonContadorKills.x + window.botonContadorKills.width &&
+            my > window.botonContadorKills.y &&
+            my < window.botonContadorKills.y + window.botonContadorKills.height
+        ) {
+            window.botonContadorKills.hover = true;
+        }
+    }
+
+    // --- Botón SALIR en contadorKills ---
+    if (estado === "contadorKills" && window.btnSalirKills) {
+        if (
+            mx > window.btnSalirKills.x &&
+            mx < window.btnSalirKills.x + window.btnSalirKills.width &&
+            my > window.btnSalirKills.y &&
+            my < window.btnSalirKills.y + window.btnSalirKills.height
+        ) {
+            window.btnSalirKills.hover = true;
+        }
+    }
+
+    resetHovers();
     if (estado === "cinematica") {
         botonSaltar.hover = mx > botonSaltar.x && mx < botonSaltar.x + botonSaltar.width &&
             my > botonSaltar.y && my < botonSaltar.y + botonSaltar.height;
@@ -590,19 +617,11 @@ actualizarProgresoMision();
             my > botonTienda.y && my < botonTienda.y + botonTienda.height;
         botonMisiones.hover = mx > botonMisiones.x && mx < botonMisiones.x + botonMisiones.width &&
             my > botonMisiones.y && my < botonMisiones.y + botonMisiones.height;
-        // Hover en el botón de supervivencia si está desbloqueado
         if (typeof botonSupervivencia !== 'undefined' && recordRonda >= 20) {
             botonSupervivencia.hover = mx > botonSupervivencia.x && mx < botonSupervivencia.x + botonSupervivencia.width &&
                 my > botonSupervivencia.y && my < botonSupervivencia.y + botonSupervivencia.height;
-        }
-        if (estado === "menu" && window.botonContadorKills)
-    window.botonContadorKills.hover = mx > window.botonContadorKills.x && mx < window.botonContadorKills.x + window.botonContadorKills.width &&
-        my > window.botonContadorKills.y && my < window.botonContadorKills.y + window.botonContadorKills.height;
-
-if (estado === "contadorKills" && window.btnSalirKills)
-    window.btnSalirKills.hover = mx > window.btnSalirKills.x && mx < window.btnSalirKills.x + window.btnSalirKills.width &&
-        my > window.btnSalirKills.y && my < window.btnSalirKills.y + window.btnSalirKills.height;
-    } else if (estado === "misiones") {
+    
+            }}else if (estado === "misiones") {
         flechaIzqMisiones.hover = mx > flechaIzqMisiones.x && mx < flechaIzqMisiones.x + flechaIzqMisiones.width &&
             my > flechaIzqMisiones.y && my < flechaIzqMisiones.y + flechaIzqMisiones.height;
         flechaDerMisiones.hover = mx > flechaDerMisiones.x && mx < flechaDerMisiones.x + flechaDerMisiones.width &&
@@ -664,6 +683,19 @@ canvas.addEventListener("click", e => {
     const scaleY = canvas.height / rect.height;
     const mx = (e.clientX - rect.left) * scaleX;
     const my = (e.clientY - rect.top) * scaleY;
+
+    // --- Botón CONTADOR DE KILLS ---
+    if (estado === "menu" && window.botonContadorKills && window.botonContadorKills.hover) {
+        estado = "contadorKills";
+        resetHovers();
+        return;
+    }
+    // --- Botón SALIR en contadorKills ---
+    if (estado === "contadorKills" && window.btnSalirKills && window.btnSalirKills.hover) {
+        estado = "menu";
+        resetHovers();
+        return;
+    }
 
     if (estado === "menu" && botonJugar.hover) {
     estado = "cinematica";
@@ -936,6 +968,8 @@ if (btnCompraGuille.hover && monedas >= 1275 && !upgradeGuille) {
     btnCompraVelocidad.hover = false;
     btnCompraVida.hover = false;
     btnSalirTienda.hover = false;
+    if (window.botonContadorKills) window.botonContadorKills.hover = false;
+    if (window.btnSalirKills) window.btnSalirKills.hover = false;
 }
 
 function drawMonedasPartida() {

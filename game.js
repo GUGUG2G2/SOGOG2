@@ -74,6 +74,15 @@ window.onload = () => {
         hover: false
     };
     
+    const btnSalirKills = {
+    x: 380, // canvas.width / 2 - 100
+    y: 452, // 540 - 88 (ajustado para estar centrado abajo, puedes cambiar este valor si lo ves desfasado)
+    width: 200,
+    height: 48,
+    hover: false
+};
+window.btnSalirKills = btnSalirKills;
+    
 const btnCompraDanio = { x: 180, y: 180, width: 120, height: 120, hover: false };
 const btnCompraVelocidad = { x: 420, y: 180, width: 120, height: 120, hover: false };
 const btnCompraVida = { x: 660, y: 180, width: 120, height: 120, hover: false };
@@ -573,30 +582,29 @@ actualizarProgresoMision();
     const mx = (e.clientX - rect.left) * scaleX;
     const my = (e.clientY - rect.top) * scaleY;
 
-    // --- Primero resetea TODOS los hovers ---
     resetHovers();
 
-    // --- Botón CONTADOR DE KILLS en menú ---
-    if (estado === "menu" && window.botonContadorKills) {
+    // Botón CONTADOR DE KILLS en menú
+    if (estado === "menu") {
+        // Si el botón existe, chequea el área
         if (
-            mx > window.botonContadorKills.x &&
-            mx < window.botonContadorKills.x + window.botonContadorKills.width &&
-            my > window.botonContadorKills.y &&
-            my < window.botonContadorKills.y + window.botonContadorKills.height
+            mx >= botonContadorKills.x &&
+            mx <= botonContadorKills.x + botonContadorKills.width &&
+            my >= botonContadorKills.y &&
+            my <= botonContadorKills.y + botonContadorKills.height
         ) {
-            window.botonContadorKills.hover = true;
+            botonContadorKills.hover = true;
         }
     }
 
-    // --- Botón SALIR en contadorKills ---
-    if (estado === "contadorKills" && window.btnSalirKills) {
+    if (estado === "contadorKills") {
         if (
-            mx > window.btnSalirKills.x &&
-            mx < window.btnSalirKills.x + window.btnSalirKills.width &&
-            my > window.btnSalirKills.y &&
-            my < window.btnSalirKills.y + window.btnSalirKills.height
+            mx >= btnSalirKills.x &&
+            mx <= btnSalirKills.x + btnSalirKills.width &&
+            my >= btnSalirKills.y &&
+            my <= btnSalirKills.y + btnSalirKills.height
         ) {
-            window.btnSalirKills.hover = true;
+            btnSalirKills.hover = true;
         }
     }
 
@@ -682,19 +690,21 @@ canvas.addEventListener("click", e => {
     const mx = (e.clientX - rect.left) * scaleX;
     const my = (e.clientY - rect.top) * scaleY;
 
-    // --- Botón CONTADOR DE KILLS ---
-    if (estado === "menu" && window.botonContadorKills && window.botonContadorKills.hover) {
+   
+    // Botón CONTADOR DE KILLS en menú
+    if (estado === "menu" && botonContadorKills.hover) {
         estado = "contadorKills";
         resetHovers();
         return;
     }
-    // --- Botón SALIR en contadorKills ---
-    if (estado === "contadorKills" && window.btnSalirKills && window.btnSalirKills.hover) {
+    
+// Botón SALIR del contador de kills
+    if (estado === "contadorKills" && btnSalirKills.hover) {
         estado = "menu";
         resetHovers();
         return;
     }
-
+    
     if (estado === "menu" && botonJugar.hover) {
     estado = "cinematica";
     resetHovers();
@@ -966,7 +976,8 @@ if (btnCompraGuille.hover && monedas >= 1275 && !upgradeGuille) {
     btnCompraVelocidad.hover = false;
     btnCompraVida.hover = false;
     btnSalirTienda.hover = false;
-    if (window.botonContadorKills) window.botonContadorKills.hover = false;
+    botonContadorKills.hover = false;
+    btnSalirKills.hover = false;
     if (window.btnSalirKills) window.btnSalirKills.hover = false;
 }
 
@@ -2331,14 +2342,6 @@ ctx.fillText(
             }
         );
     }
-    // ---- AGREGADO: Botón CONTADOR DE KILLS abajo a la derecha ----
-    let botonContadorKills = {
-        x: canvas.width - 220,
-        y: canvas.height - 80,
-        width: 180,
-        height: 54,
-        hover: false
-    };
     drawButton(
         botonContadorKills,
         "CONTADOR DE KILLS",
@@ -2349,8 +2352,6 @@ ctx.fillText(
             fontSize: 19
         }
     );
-    window.botonContadorKills = botonContadorKills;
-
 }
 function drawMisiones() {
     // Fondo gradiente y glow
@@ -2690,6 +2691,7 @@ function drawContadorKills() {
         height: 48,
         hover: window.btnSalirKills ? window.btnSalirKills.hover : false
     };
+    // Botón salir centrado abajo (SIEMPRE el mismo objeto global)
     drawButton(
         btnSalirKills,
         "SALIR",
@@ -2701,7 +2703,6 @@ function drawContadorKills() {
             shadowColor: btnSalirKills.hover ? "#39e279" : "#FFD700"
         }
     );
-    window.btnSalirKills = btnSalirKills;
 
     ctx.restore();
 }

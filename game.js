@@ -74,14 +74,23 @@ window.onload = () => {
         hover: false
     };
     
-    const btnSalirKills = {
-    x: 380, // canvas.width / 2 - 100
-    y: 452, // 540 - 88 (ajustado para estar centrado abajo, puedes cambiar este valor si lo ves desfasado)
+    // --- Botón CONTADOR DE KILLS en menú ---
+const botonContadorKills = {
+    x: canvas.width - 220,
+    y: canvas.height - 80,
+    width: 180,
+    height: 54,
+    hover: false
+};
+
+// --- Botón SALIR en el contador de kills ---
+const btnSalirKills = {
+    x: canvas.width / 2 - 100,
+    y: 452, // ajusta según tu layout
     width: 200,
     height: 48,
     hover: false
 };
-window.btnSalirKills = btnSalirKills;
     
 const btnCompraDanio = { x: 180, y: 180, width: 120, height: 120, hover: false };
 const btnCompraVelocidad = { x: 420, y: 180, width: 120, height: 120, hover: false };
@@ -584,9 +593,7 @@ actualizarProgresoMision();
 
     resetHovers();
 
-    // Botón CONTADOR DE KILLS en menú
     if (estado === "menu") {
-        // Si el botón existe, chequea el área
         if (
             mx >= botonContadorKills.x &&
             mx <= botonContadorKills.x + botonContadorKills.width &&
@@ -596,7 +603,6 @@ actualizarProgresoMision();
             botonContadorKills.hover = true;
         }
     }
-
     if (estado === "contadorKills") {
         if (
             mx >= btnSalirKills.x &&
@@ -607,6 +613,7 @@ actualizarProgresoMision();
             btnSalirKills.hover = true;
         }
     }
+
 
   
     if (estado === "cinematica") {
@@ -691,20 +698,17 @@ canvas.addEventListener("click", e => {
     const my = (e.clientY - rect.top) * scaleY;
 
    
-    // Botón CONTADOR DE KILLS en menú
     if (estado === "menu" && botonContadorKills.hover) {
         estado = "contadorKills";
         resetHovers();
         return;
     }
-    
-// Botón SALIR del contador de kills
     if (estado === "contadorKills" && btnSalirKills.hover) {
         estado = "menu";
         resetHovers();
         return;
     }
-    
+
     if (estado === "menu" && botonJugar.hover) {
     estado = "cinematica";
     resetHovers();
@@ -2352,7 +2356,9 @@ ctx.fillText(
             fontSize: 19
         }
     );
+
 }
+
 function drawMisiones() {
     // Fondo gradiente y glow
     ctx.save();
@@ -2682,16 +2688,7 @@ function drawContadorKills() {
     ctx.fillText("Congelaciones: " + congelacionesOtarin, boxX + boxW / 2, oy + boxH / 2 + 6);
     ctx.restore();
 
-    // Botón salir centrado abajo
-    let salirY = oy + sepY + 40;
-    let btnSalirKills = {
-        x: canvas.width / 2 - 100,
-        y: salirY,
-        width: 200,
-        height: 48,
-        hover: window.btnSalirKills ? window.btnSalirKills.hover : false
-    };
-    // Botón salir centrado abajo (SIEMPRE el mismo objeto global)
+    
     drawButton(
         btnSalirKills,
         "SALIR",
@@ -2706,6 +2703,7 @@ function drawContadorKills() {
 
     ctx.restore();
 }
+
 function actualizarProgresoMision() {
     upgradeDanio = localStorage.getItem("upgradeDanio") === "true";
     upgradeVelocidad = localStorage.getItem("upgradeVelocidad") === "true";
